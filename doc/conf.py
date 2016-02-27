@@ -103,6 +103,10 @@ except Exception:
 # -- Options for HTML output ----------------------------------------------
 
 html_title = project + ' version ' + release
+html_theme = 'classic'
+html_theme_options = {
+    'collapsiblesidebar': True,
+}
 
 # -- Options for LaTeX output ---------------------------------------------
 
