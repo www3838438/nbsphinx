@@ -44,7 +44,7 @@ html_sourcelink_suffix = ''
 #nbsphinx_responsive_width = '700px'
 
 # If True, the (executed) notebooks are copied into the HTML output directory:
-#nbsphinx_save_notebooks = True
+nbsphinx_save_notebooks = True
 
 # -- The settings below this line are not specific to nbsphinx ------------
 
