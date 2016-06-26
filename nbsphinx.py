@@ -660,6 +660,17 @@ class NotebookParser(rst.Parser):
             with open(dest, 'wb') as f:
                 f.write(data)
 
+        if env.config.nbsphinx_save_notebooks:
+            auxfile = env.doc2path(env.docname, base=auxdir)
+            notebookfile = env.doc2path(env.docname, base=None)
+            sphinx.util.ensuredir(
+                os.path.join(auxdir, os.path.dirname(notebookfile)))
+            nbformat.write(nb, os.path.join(env.srcdir, auxfile))
+
+            if not hasattr(env, 'nbsphinx_notebooks'):
+                env.nbsphinx_notebooks = {}
+            env.nbsphinx_notebooks[env.docname] = auxfile, notebookfile
+
         rst.Parser.parse(self, rststring, document)
 
 
@@ -1213,6 +1224,12 @@ def html_collect_pages(app):
             sphinx.util.copyfile(os.path.join(app.env.srcdir, file), target)
         except OSError as err:
             app.warn('cannot copy local file {!r}: {}'.format(file, err))
+
+    notebooks = getattr(app.env, 'nbsphinx_notebooks', {}).values()
+    for source, target in status_iterator(
+            notebooks, 'copying notebooks ... ',
+            sphinx.util.console.brown, len(notebooks)):
+        sphinx.util.copyfile(source, os.path.join(app.builder.outdir, target))
     return []  # No new HTML pages are created
 
 
@@ -1220,6 +1237,10 @@ def env_purge_doc(app, env, docname):
     """Remove list of local files for a given document."""
     try:
         del env.nbsphinx_files[docname]
+    except (AttributeError, KeyError):
+        pass
+    try:
+        del env.nbsphinx_notebooks[docname]
     except (AttributeError, KeyError):
         pass
 
@@ -1351,6 +1372,7 @@ def setup(app):
     # Default value is set in builder_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
+    app.add_config_value('nbsphinx_save_notebooks', False, rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
