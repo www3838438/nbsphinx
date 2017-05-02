@@ -1000,13 +1000,11 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             if target:
                 target_ext = ''
                 reftype = 'doc'
-                refdomain = None
             elif '.ipynb#' in uri.lower():
                 idx = uri.lower().find('.ipynb#')
                 target = unquote(uri[:idx])
                 target_ext = uri[idx:]
                 reftype = 'ref'
-                refdomain = 'std'
             else:
                 file = os.path.normpath(
                     os.path.join(os.path.dirname(env.docname), unquoted_uri))
@@ -1032,7 +1030,7 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                     target = target.lower()
                 linktext = node.astext()
                 xref = sphinx.addnodes.pending_xref(
-                    reftype=reftype, reftarget=target, refdomain=refdomain,
+                    reftype=reftype, reftarget=target, refdomain='std',
                     refwarn=True, refexplicit=True, refdoc=env.docname)
                 xref += docutils.nodes.Text(linktext, linktext)
                 node.replace_self(xref)
